@@ -1,7 +1,7 @@
 local API = require("api")
 local SHOP = {}
 
-SHOP_CONTAINER = 1265
+local SHOP_CONTAINER = 1265
 
 SHOP.BUY_OPTIONS = {
   ONE = 2,
@@ -14,7 +14,7 @@ SHOP.BUY_OPTIONS = {
 
 --- `shop_index` = index of the item in the shop's list of items (0 based)
 --- i.e. the first item in the shop has an shop_index of 0
-function getItemIC(shop_index)
+local function getItemIC(shop_index)
   return API.ScanForInterfaceTest2Get(false, {
     InterfaceComp5.new(SHOP_CONTAINER,7,-1,-1,0), 
     InterfaceComp5.new(SHOP_CONTAINER,9,-1,7,0), 
@@ -27,7 +27,7 @@ function getItemIC(shop_index)
 end
 
 --- `sample_index` = index of the item in the shop's list of free samples (0 based)
-function getFreeSampleItemIC(sample_index)
+local function getFreeSampleItemIC(sample_index)
   return API.ScanForInterfaceTest2Get(false, {
     InterfaceComp5.new(SHOP_CONTAINER,7,-1,-1,0), 
     InterfaceComp5.new(SHOP_CONTAINER,9,-1,7,0), 
@@ -153,7 +153,7 @@ end
 
 ---The position of the "All" option changes based on the number of items in stock
 ---@return number
-function getAllOptionIndex(index, is_free_sample)
+local function getAllOptionIndex(index, is_free_sample)
   stackSize = 0
   if is_free_sample then
     stackSize = SHOP.getFreeSampleStackSize(index)
