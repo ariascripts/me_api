@@ -130,6 +130,15 @@ function SHOP.getItems()
   return items
 end
 
+---@return bool
+function SHOP.contains(id)
+  local items = SHOP.getItems()
+  for i = 1, #items do
+    if items[i].itemid1 == id and items[i].itemid1_size > 0 then return true end
+  end
+  return false
+end
+
 ---Returns the free samples available from the shop
 ---@return vector<number, number>
 function SHOP.getFreeSamples()
@@ -193,7 +202,19 @@ function SHOP.buyItem(shop_index, buy_option)
       return false
     end
   end
-  return API.DoAction_Interface(0xffffffff,0xffffffff,buy_option,SHOP_CONTAINER,20,shop_index,5392)
+  return API.DoAction_Interface(0xffffffff,0xffffffff,buy_option,SHOP_CONTAINER,20,shop_index,API.OFF_ACT_GeneralInterface_route)
+end
+
+
+---@param id number
+---@param buy_option number
+---@return boolean
+function SHOP.buyId(id, buy_option)
+  local items = SHOP.getItems()
+  for i = 1, #items do
+    if items[i].itemid1 == id then return SHOP.buyItem(i - 1, buy_option) end
+  end
+  return false
 end
 
 ---@param sample_index number
@@ -204,7 +225,7 @@ function SHOP.takeFreeSample(sample_index)
     print("Unable to find free sample at index:", sample_index)
     return false
   end
-  return API.DoAction_Interface(0xffffffff,0xffffffff,optionIndex,SHOP_CONTAINER,14,sample_index,5392)
+  return API.DoAction_Interface(0xffffffff,0xffffffff,optionIndex,SHOP_CONTAINER,14,sample_index,API.OFF_ACT_GeneralInterface_route)
 end
 
 ---Claims all free samples available
