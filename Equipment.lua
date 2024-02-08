@@ -2,6 +2,8 @@ local API = require("api")
 
 Equipment = {}
 
+local MIN_SLOT, MAX_SLOT = 0, 12
+
 --slot = equip slot number for API.GetEquipSlot
 --index = interface index for interacting with the item
 local SLOTS = {
@@ -23,7 +25,7 @@ local SLOTS = {
 --This function will always return false if the GE is open
 ---@param id number
 function Equipment.contains(id)
-    for i = 0, 12 do
+    for i = MIN_SLOT, MAX_SLOT do
         local item = API.GetEquipSlot(i)
         if item ~= nil then
             if item.itemid1 > 0 and item.itemid1 == id then return true end
@@ -32,8 +34,72 @@ function Equipment.contains(id)
     return false
 end
 
+---@param ids table --list of ids
+function Equipment.containsAllOf(ids)
+    for _, id in ipairs(ids) do
+        if not Equipment.contains(id) then return false end
+    end
+    return true
+end
+
+---@param ids table --list of ids
+function Equipment.containsAnyOf(ids)
+    for _, id in ipairs(ids) do
+        if Equipment.contains(id) then return true end
+    end
+    return false
+end
+
+---@param ids table --list of ids, must be an exact match
+function Equipment.containsOnly(ids)
+    local equips = {}
+    local count = 0
+    for i = MIN_SLOT, MAX_SLOT do
+        local item = API.GetEquipSlot(i)
+        if item.itemid1 > 0 then
+            equips[item.itemid1] = true
+            count = count + 1
+        end
+    end
+
+    for _, id in ipairs(ids) do
+        if equips[id] == nil then
+            return false
+        elseif equips[id] then --ignore duplicate ids
+            equips[id] = false
+            count = count - 1
+        end
+    end
+    return count == 0 --if count > 0, that means there were other equips not in `ids`
+end
+
+---@param ids table|nil
+function Equipment.getQuantity(ids)
+    local equips = {}
+    local count = 0
+    for i = MIN_SLOT, MAX_SLOT do
+        local item = API.GetEquipSlot(i)
+        if item.itemid1 > 0 then
+            equips[item.itemid1] = true
+            count = count + 1
+        end
+    end
+    if not ids then
+        return count
+    end
+
+    local res = 0
+    for _, id in ipairs(ids) do
+        if equips[id] then --ignore duplicate ids
+            equips[id] = false
+            res = res + 1
+        end
+    end
+    return res
+end
+
 function Equipment.isEmpty()
-    for i = 0, 12 do
+    for i = MIN_SLOT, MAX_SLOT do
         local item = API.GetEquipSlot(i)
         if item.itemid1 > 0 then return false end
     end
