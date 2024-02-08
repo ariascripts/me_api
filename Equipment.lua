@@ -2,8 +2,6 @@ local API = require("api")
 
 Equipment = {}
 
-local MIN_SLOT, MAX_SLOT = 0, 12
-
 --slot = equip slot number for API.GetEquipSlot
 --index = interface index for interacting with the item
 local SLOTS = {
@@ -25,11 +23,8 @@ local SLOTS = {
 --This function will always return false if the GE is open
 ---@param id number
 function Equipment.contains(id)
-    for i = MIN_SLOT, MAX_SLOT do
-        local item = API.GetEquipSlot(i)
-        if item ~= nil then
-            if item.itemid1 > 0 and item.itemid1 == id then return true end
-        end
+    for _, item in ipairs(API.ReadEquipment()) do
+        if item.itemid1 > 0 and item.itemid1 == id then return true end
     end
     return false
 end
@@ -50,12 +45,12 @@ function Equipment.containsAnyOf(ids)
     return false
 end
 
----@param ids table --list of ids, must be an exact match
+---@param ids table --list of ids
+--if the list contains two or more of the same type of item (i.e. ring), then `containsOnly` will always return false
 function Equipment.containsOnly(ids)
     local equips = {}
     local count = 0
-    for i = MIN_SLOT, MAX_SLOT do
-        local item = API.GetEquipSlot(i)
+    for _, item in ipairs(API.ReadEquipment()) do
         if item.itemid1 > 0 then
             equips[item.itemid1] = true
             count = count + 1
@@ -77,8 +72,7 @@ end
 function Equipment.getQuantity(ids)
     local equips = {}
     local count = 0
-    for i = MIN_SLOT, MAX_SLOT do
-        local item = API.GetEquipSlot(i)
+    for _, item in ipairs(API.ReadEquipment()) do
         if item.itemid1 > 0 then
             equips[item.itemid1] = true
             count = count + 1
@@ -99,11 +93,18 @@ function Equipment.getQuantity(ids)
 end
 
 function Equipment.isEmpty()
-    for i = MIN_SLOT, MAX_SLOT do
-        local item = API.GetEquipSlot(i)
+    for _, item in ipairs(API.ReadEquipment()) do
         if item.itemid1 > 0 then return false end
     end
     return true
+end
+
+function Equipment.isOpen()
+    return API.EquipInterfaceCheckvarbit()
+end
+
+function Equipment.open()
+    return API.OpenEquipInterface2()
 end
 
 local function getId(slot) return API.GetEquipSlot(slot.slot).itemid1 end
