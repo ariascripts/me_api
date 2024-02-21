@@ -40,7 +40,7 @@ local function getFreeSampleItemIC(sample_index)
 end
 
 function SHOP.isOpen() 
-  return API.VB_FindPSett(2874, 1, 0).state == 18 --Value of varbit was 18 when the shops I tried are open, this varbit is also used for the lodestone interface
+  return API.Compare2874Status(18, false) --Value of varbit was 18 when the shops I tried are open, this varbit is also used for the lodestone interface
 end
 
 ---@param shop_index number
