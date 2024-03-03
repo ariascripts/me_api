@@ -2,6 +2,7 @@ local API = require("api")
 
 InputText = {}
 
+--credit to Pizzanova for much of the typing code
 local function typeString(inputString)
     for i = 1, #inputString do
         local char = inputString:sub(i, i)
