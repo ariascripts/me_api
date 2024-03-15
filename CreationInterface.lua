@@ -66,17 +66,17 @@ function CreationInterface.getCurrentCategory()
     end
 end
 
----@param text string
+---@param name string
 ---@return boolean
-function CreationInterface.selectCategory(text)
+function CreationInterface.selectCategory(name)
     API.DoAction_Interface(0x2e,0xffffffff,1,1371,28,-1,API.OFF_ACT_GeneralInterface_route)
     API.RandomSleep2(300, 50, 50)
     for i = 0, 15 do
         local ic = getDropdownIC(i)
         if #ic > 0 then
             local optionText = string.sub(API.ReadCharsPointer(ic[1].memloc + API.I_itemids3), 1, 50)
-            if optionText == text then
-                print("Selecting category: " .. text)
+            if optionText == name then
+                print("Selecting category: " .. name)
                 API.DoAction_Interface(0xffffffff,0xffffffff,1,1477,COMBO_BOX,i * 2 + 1,API.OFF_ACT_GeneralInterface_route)
                 return true
             end
@@ -113,6 +113,26 @@ end
 --use for items that `CreationInterface.selectItem` doesn't work for
 function CreationInterface.selectByIndex(index)
     return API.DoAction_Interface(0xffffffff,0xffffffff,1,1371,22,index,API.OFF_ACT_GeneralInterface_route)
+end
+
+--Interacts with the "craft" button
+function CreationInterface.process()
+    return API.DoAction_Interface(0xffffffff,0xffffffff,0,1370,30,-1,API.OFF_ACT_GeneralInterface_Choose_option)
+end
+
+--This only works for items that `CreationInterface.selectItem` supports
+---@param item_id number
+---@param category string --optional
+function CreationInterface.selectAndProcess(item_id, category)
+    if category and CreationInterface.getCurrentCategory() ~= category then
+        CreationInterface.selectCategory(category)
+    else
+        if CreationInterface.getSelectedItemId() == item_id then
+            return CreationInterface.process()
+        else
+            CreationInterface.selectItem(item_id)
+        end
+    end
 end
 
 return CreationInterface
