@@ -28,7 +28,7 @@ function CreationInterface.getSelectedItemId()
     return API.VB_FindPSettinOrder(1170, 0).state
 end
 
-function CreationInterface.isCreationInterfaceOpen()
+function CreationInterface.isOpen()
     return CreationInterface.getSelectedItemId() ~= -1 and (API.Compare2874Status(18, false) or API.Compare2874Status(40, false))
 end
 
